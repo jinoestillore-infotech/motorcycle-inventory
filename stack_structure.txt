@@ -1,0 +1,22 @@
+
+
+Frontend
+- HTML
+- CSS
+- Bootstrap 5
+- JavaScript
+
+Backend
+- Node.js
+- Express.js
+
+Database
+- MySQL
+
+Suggest a folder structure, these are in my mind:
+
+Assets folder (css, js, images)
+Frontend
+Backend
+Database
+Includes

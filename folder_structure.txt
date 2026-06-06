@@ -1,0 +1,95 @@
+Motorcycle Parts Inventory System
+
+Tech Stack: HTML/CSS/Bootstrap 5/JS (Frontend) | Node.js/Express (Backend) | MySQL (Database)
+
+Recommended Folder Structure
+
+Based on your initial ideas, here is the best-practice way to organize this specific stack. We are separating the client (Frontend) from the server (Backend) to keep things clean.
+
+motorcycle-inventory/
+│
+├── client/                     <-- Replaces your "Frontend" idea
+│   ├── assets/                 <-- Replaces your "Assets" idea
+│   │   ├── css/                <-- Custom CSS (Bootstrap overrides)
+│   │   ├── js/                 <-- Frontend JS (API calls, DOM manipulation)
+│   │   └── images/             <-- Logos, motorcycle part images
+│   ├── components/             <-- Replaces your "Includes" idea (e.g., header, sidebar)
+│   ├── index.html              <-- Main Dashboard
+│   ├── inventory.html          <-- Parts list table
+│   └── add-part.html           <-- Form to add new items
+│
+├── server/                     <-- Replaces your "Backend" idea
+│   ├── config/                 <-- Replaces your "Database" idea (Connection logic)
+│   │   └── db.js               <-- MySQL connection setup
+│   ├── controllers/            <-- Functions that handle requests (e.g., getParts, addPart)
+│   ├── routes/                 <-- Express API URLs (e.g., /api/parts)
+│   ├── server.js               <-- Main entry point for Node.js
+│   └── package.json            <-- Node dependencies (express, mysql2, cors)
+│
+└── database/                   <-- Dedicated folder for SQL scripts
+    └── schema.sql              <-- Your SQL queries to create tables
+
+
+Mapping Your Ideas to the Structure
+
+Frontend & Assets (client/ & client/assets/)
+Since you are using plain HTML/JS (not React/Vue), all your user-facing files live here. Your custom CSS, Bootstrap files (if downloaded locally instead of CDN), and frontend scripts go into the assets folder.
+
+Includes (client/components/)
+Note: Pure HTML doesn't natively support "includes" (like PHP does). To reuse code like a Navbar or Sidebar across multiple HTML files, you have two options with this stack:
+
+Option A (Frontend): Create navbar.html in the components folder and use JavaScript fetch() to load it into your pages dynamically.
+
+Option B (Backend - Recommended if complex): Tell Express to use a template engine like EJS or Handlebars. This allows you to use syntax like <%- include('partials/header') %> right in your HTML.
+
+Backend (server/)
+This is where Express lives. We break it down further into routes (the URLs your frontend will talk to) and controllers (the actual logic of querying the database and returning data).
+
+Database (server/config/db.js & database/)
+The server/config/db.js file will hold your mysql2 connection pool. The root database/ folder is just a handy place to store your .sql files so you can easily recreate your database structure on a new machine.
+
+Starter Database Schema (MySQL)
+
+To get you started, here is a suggested foundational schema for a motorcycle parts shop:
+
+-- Create the database
+CREATE DATABASE IF NOT EXISTS moto_inventory;
+USE moto_inventory;
+
+-- Categories (e.g., Engine, Brakes, Suspension, Accessories)
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+);
+
+-- Parts Inventory
+CREATE TABLE parts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(50) UNIQUE NOT NULL,       -- Stock Keeping Unit / Barcode
+    name VARCHAR(255) NOT NULL,
+    category_id INT,
+    brand VARCHAR(100),                    -- e.g., Brembo, NGK, Yamaha Genuine
+    compatible_models TEXT,                -- e.g., "Yamaha MT-07, Honda CBR600"
+    stock_quantity INT DEFAULT 0,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+
+Next Steps to Start Coding
+
+Initialize the Backend: Open your terminal, navigate to the server/ folder, and run:
+
+npm init -y
+
+npm install express mysql2 cors
+
+npm install --save-dev nodemon (for auto-restarting your server during development)
+
+Setup the Database: Open your MySQL workbench or command line and run the schema.sql script to create your tables.
+
+Build the API: Create a simple Express server in server.js that connects to MySQL and creates a GET /api/parts route.
+
+Connect the Frontend: In your client/assets/js/main.js, write a fetch('http://localhost:3000/api/parts') function to grab the data and dynamically populate your Bootstrap tables.
