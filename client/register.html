@@ -8,60 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <style>
-        body {
-            background-color: #f4f6f9;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 0;
-        }
-        .auth-card {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            max-width: 900px;
-            width: 100%;
-        }
-        .auth-image-bg {
-            /* Using a high-quality placeholder for a motorcycle shop theme */
-            background-image: url('https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
-            background-size: cover;
-            background-position: center;
-            min-height: 100%;
-        }
-        .auth-form-container {
-            padding: 3rem;
-            background-color: #ffffff;
-        }
-        .brand-logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #212529;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 1.5rem;
-        }
-        .brand-logo i {
-            color: #0d6efd;
-        }
-        .form-floating:focus-within label {
-            color: #0d6efd;
-        }
-    </style>
+    <link href="assets/css/register.css" rel="stylesheet">
 </head>
 <body>
-
 <div class="container">
     <div class="card auth-card mx-auto">
         <div class="row g-0 flex-row-reverse">
             <!-- Right Side: Image (Hidden on small screens) - Reversed for Register page -->
             <div class="col-md-5 d-none d-md-block auth-image-bg">
             </div>
-            
             <!-- Left Side: Register Form -->
             <div class="col-md-7 auth-form-container">
                 <div class="text-center text-md-start">
@@ -71,23 +26,19 @@
                     <h3 class="fw-bold mb-1">Create an Account</h3>
                     <p class="text-muted mb-4">Set up your admin access to manage the shop.</p>
                 </div>
-
                 <!-- Error/Success Message Placeholder -->
                 <div id="messageBox" class="alert d-none" role="alert"></div>
-
                 <form id="registerForm" onsubmit="handleRegister(event)">
                     <!-- Full Name -->
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="nameInput" placeholder="John Doe" required>
                         <label for="nameInput"><i class="bi bi-person me-2"></i>Full Name</label>
                     </div>
-
                     <!-- Email Input -->
                     <div class="form-floating mb-3">
                         <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
                         <label for="emailInput"><i class="bi bi-envelope me-2"></i>Email address</label>
                     </div>
-                    
                     <div class="row">
                         <!-- Password Input -->
                         <div class="col-md-6">
@@ -104,12 +55,10 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Submit Button -->
                     <div class="d-grid mb-4">
                         <button class="btn btn-primary btn-lg" type="submit">Create Account</button>
                     </div>
-
                     <!-- Link to Login -->
                     <div class="text-center text-muted">
                         Already have an account? <a href="login.html" class="text-primary text-decoration-none fw-bold">Log in here</a>
@@ -122,61 +71,6 @@
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    async function handleRegister(event) {
-        event.preventDefault(); // Prevent actual form submission
-        
-        const name = document.getElementById('nameInput').value;
-        const email = document.getElementById('emailInput').value;
-        const password = document.getElementById('passwordInput').value;
-        const confirmPassword = document.getElementById('confirmPasswordInput').value;
-        const messageBox = document.getElementById('messageBox');
-
-        // Reset message box
-        messageBox.classList.remove('d-none', 'alert-success', 'alert-danger');
-
-        // Front-end validation: Check if passwords match
-        if (password !== confirmPassword) {
-            messageBox.classList.add('alert-danger');
-            messageBox.innerText = "Passwords do not match. Please try again.";
-            messageBox.classList.remove('d-none');
-            return;
-        }
-
-        try {
-            // Send the data to your Node.js backend
-            const response = await fetch('http://localhost:3000/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name, email, password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                messageBox.classList.add('alert-success');
-                messageBox.innerText = "Account created successfully! Redirecting to login...";
-                messageBox.classList.remove('d-none');
-
-                // Redirect to login page after 1.5 seconds
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 1500);
-            } else {
-                // If backend returns an error (e.g., Email already registered)
-                messageBox.classList.add('alert-danger');
-                messageBox.innerText = data.message || "Registration failed.";
-                messageBox.classList.remove('d-none');
-            }
-        } catch (error) {
-            console.error('Registration error:', error);
-            messageBox.classList.add('alert-danger');
-            messageBox.innerText = "Cannot connect to server. Ensure Node is running on port 3000.";
-            messageBox.classList.remove('d-none');
-        }
-    }
-</script>
+<script src="../backend/register.js"></script>
 </body>
 </html>

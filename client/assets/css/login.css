@@ -1,0 +1,40 @@
+body {
+    background-color: #f4f6f9;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+.auth-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+}
+.auth-image-bg {
+    background-image: url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+    background-size: cover;
+    background-position: center;
+    min-height: 100%;
+}
+.auth-form-container {
+    padding: 3rem;
+    background-color: #ffffff;
+}
+.brand-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #212529;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+.brand-logo i {
+    color: #0d6efd;
+}
+.form-floating:focus-within label {
+    color: #0d6efd;
+}
