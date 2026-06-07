@@ -1,7 +1,6 @@
 const db = require('../config/db');
 
 const addPart = async (req, res) => {
-    // Sanitize and read fields
     const sku = req.body.sku?.trim().toUpperCase();
     const name = req.body.name?.trim();
     const category_id = parseInt(req.body.category_id);
@@ -14,12 +13,8 @@ const addPart = async (req, res) => {
         return res.status(400).json({ message: 'SKU, Name, Category, and valid Price are required.' });
     }
 
-    if (stock_quantity < 0) {
-        return res.status(400).json({ message: 'Stock quantity cannot be less than zero.' });
-    }
-
-    if (price < 0) {
-        return res.status(400).json({ message: 'Price cannot be less than zero.' });
+    if (stock_quantity < 0 || price < 0) {
+        return res.status(400).json({ message: 'Price and stock quantity cannot be negative.' });
     }
 
     try {
@@ -50,7 +45,6 @@ const addPart = async (req, res) => {
 
 const getParts = async (req, res) => {
     try {
-        // Fetch parts joined with category name for readability
         const [parts] = await db.query(`
             SELECT p.*, c.name AS category_name 
             FROM parts p 
@@ -83,7 +77,6 @@ const updatePart = async (req, res) => {
     }
 
     try {
-        // Verify SKU is unique excluding the current part
         const [existingPart] = await db.query('SELECT id FROM parts WHERE sku = ? AND id != ?', [sku, id]);
         if (existingPart.length > 0) {
             return res.status(400).json({ message: `SKU '${sku}' is already allocated to another part.` });
@@ -115,6 +108,14 @@ const deletePart = async (req, res) => {
         res.status(200).json({ message: 'Part removed from inventory successfully.' });
     } catch (error) {
         console.error('Error deleting part:', error);
+        
+        // Handle foreign key constraint error (typically errno 1451)
+        if (error.errno === 1451) {
+            return res.status(400).json({ 
+                message: 'Cannot delete this part because it is linked to existing transaction/sales history. Try editing its stock to 0 instead.' 
+            });
+        }
+        
         res.status(500).json({ message: 'Server error while deleting part.' });
     }
 };
