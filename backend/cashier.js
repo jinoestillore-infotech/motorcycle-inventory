@@ -407,7 +407,7 @@ async function handleCheckout(event) {
 
         if (response.ok) {
             // Populate sales invoice receipt modal parameters
-            document.getElementById('receiptId').innerText = `#TX-${data.transactionId}`;
+            document.getElementById('receiptId').innerText = `#TXSLS001${data.transactionId}`;
             document.getElementById('receiptTotal').innerText = `$${parseFloat(data.totalAmount).toFixed(2)}`;
             document.getElementById('receiptPaid').innerText = `$${amountPaid.toFixed(2)}`;
             document.getElementById('receiptChange').innerText = `$${parseFloat(data.changeAmount).toFixed(2)}`;
