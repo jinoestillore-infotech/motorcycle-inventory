@@ -35,6 +35,10 @@ async function handleRegister(event) {
             messageBox.innerText = "Account created successfully! Redirecting to login...";
             messageBox.classList.remove('d-none');
 
+            // Store the new user and secure JWT token automatically
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+            
             // Redirect to login page after 1.5 seconds
             setTimeout(() => {
                 window.location.href = 'login.html';

@@ -27,6 +27,8 @@ async function handleLogin(event) {
 
             // Store user context temporarily in localStorage (simulating basic auth flow)
             localStorage.setItem('user', JSON.stringify(data.user));
+            // Store the secure JWT token
+            localStorage.setItem('token', data.token);
 
             // Redirect to dashboard page after 1.5 seconds
             setTimeout(() => {

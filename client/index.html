@@ -118,14 +118,14 @@
             </div>
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=0d6efd&color=fff" alt="User" width="32" height="32" class="rounded-circle me-2">
-                    <strong>Admin</strong>
+                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=Admin+User&background=0d6efd&color=fff" alt="User" width="32" height="32" class="rounded-circle me-2">
+                    <strong id="userNameDisplay">Loading...</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow">
                     <li><a class="dropdown-item" href="#">Profile</a></li>
                     <li><a class="dropdown-item" href="#">Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#">Sign out</a></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Sign out</a></li>
                 </ul>
             </div>
         </header>
@@ -249,6 +249,33 @@
 <!-- Custom JS for Frontend functionality -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- Authentication Check ---
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+
+        if (!token || !userStr) {
+            // User is not logged in, redirect to login page
+            window.location.href = 'login.html';
+            return; // Stop execution
+        }
+
+        // Parse user data and update UI
+        const user = JSON.parse(userStr);
+        document.getElementById('userNameDisplay').innerText = user.name;
+        
+        // Generate an avatar based on the user's name
+        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0d6efd&color=fff`;
+        document.getElementById('userAvatar').src = avatarUrl;
+
+        // Handle Logout
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        // --- Sidebar Logic ---
         // Simple logic to toggle sidebar on smaller screens (Mobile functionality)
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.querySelector('.sidebar');
