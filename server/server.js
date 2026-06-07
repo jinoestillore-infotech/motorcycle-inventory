@@ -4,6 +4,7 @@ const db = require('./config/db'); // Just to initialize the connection
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const partRoutes = require('./routes/partRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/parts', partRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;

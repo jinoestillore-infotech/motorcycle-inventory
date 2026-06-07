@@ -124,11 +124,11 @@ function renderInventory(items) {
     items.forEach(part => {
         let stockBadge = '';
         if (part.stock_quantity === 0) {
-            stockBadge = '<span class="stock-badge bg-danger bg-opacity-10 text-danger fw-bold">Out of Stock</span>';
+            stockBadge = '<span class="stock-badge bg-danger bg-opacity-10 text-danger fw-bold">Out</span>';
         } else if (part.stock_quantity <= 5) {
-            stockBadge = `<span class="stock-badge bg-warning bg-opacity-10 text-warning fw-bold">${part.stock_quantity} Low Stock</span>`;
+            stockBadge = `<span class="stock-badge bg-warning bg-opacity-10 text-warning fw-bold">${part.stock_quantity}</span>`;
         } else {
-            stockBadge = `<span class="stock-badge bg-success bg-opacity-10 text-success">${part.stock_quantity} Units</span>`;
+            stockBadge = `<span class="stock-badge bg-success bg-opacity-10 text-success">${part.stock_quantity}</span>`;
         }
 
         const tr = document.createElement('tr');

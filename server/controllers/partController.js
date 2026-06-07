@@ -119,9 +119,36 @@ const deletePart = async (req, res) => {
     }
 };
 
+// Quick Stock Adjustment Controller Function
+const adjustStock = async (req, res) => {
+    const { id } = req.params;
+    const increment = parseInt(req.body.increment);
+
+    if (isNaN(increment)) {
+        return res.status(400).json({ message: 'Invalid increment value.' });
+    }
+
+    try {
+        const [result] = await db.query(
+            'UPDATE parts SET stock_quantity = stock_quantity + ? WHERE id = ?',
+            [increment, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Part specifications not found.' });
+        }
+
+        res.status(200).json({ message: 'Inventory levels updated successfully!' });
+    } catch (error) {
+        console.error('Error updating stock level:', error);
+        res.status(500).json({ message: 'Server error while updating inventory level.' });
+    }
+};
+
 module.exports = {
     addPart,
     getParts,
     updatePart,
-    deletePart
+    deletePart,
+    adjustStock
 };
