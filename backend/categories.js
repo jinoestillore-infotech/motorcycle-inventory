@@ -32,6 +32,19 @@ let editingCategoryId = null;
 let deleteModal = null;
 let deletingCategoryId = null;
 
+// Helper to show alert that automatically disappears after 2 seconds
+function showAlert(message, isSuccess) {
+    const messageBox = document.getElementById('messageBox');
+    messageBox.innerText = message;
+    messageBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+    messageBox.classList.remove('d-none');
+
+    // Automatically hide alert after 2000ms (2 seconds)
+    setTimeout(() => {
+        messageBox.classList.add('d-none');
+    }, 2000);
+}
+
 // Initialize delete modal on load
 document.addEventListener('DOMContentLoaded', () => {
     deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
@@ -114,7 +127,6 @@ async function handleAddCategory(event) {
 
     submitBtn.disabled = true;
     messageBox.classList.add('d-none');
-    messageBox.classList.remove('alert-success', 'alert-danger');
 
     const requestBody = {
         name: nameInput.value,
@@ -139,9 +151,8 @@ async function handleAddCategory(event) {
         const data = await response.json();
 
         if (response.ok) {
-            messageBox.innerText = data.message;
-            messageBox.classList.add('alert-success');
-            messageBox.classList.remove('d-none');
+            // Trigger auto-dismissing alert
+            showAlert(data.message, true);
             
             // Reset form state
             cancelEdit();
@@ -149,15 +160,11 @@ async function handleAddCategory(event) {
             // Refresh table
             loadCategories();
         } else {
-            messageBox.innerText = data.message || "Failed to process category.";
-            messageBox.classList.add('alert-danger');
-            messageBox.classList.remove('d-none');
+            showAlert(data.message || "Failed to process category.", false);
         }
     } catch (error) {
         console.error('Error:', error);
-        messageBox.innerText = "Network error. Make sure your server is running.";
-        messageBox.classList.add('alert-danger');
-        messageBox.classList.remove('d-none');
+        showAlert("Network error. Make sure your server is running.", false);
     } finally {
         submitBtn.disabled = false;
     }
@@ -225,13 +232,8 @@ async function executeDelete() {
         const data = await response.json();
         deleteModal.hide();
 
-        const messageBox = document.getElementById('messageBox');
-        messageBox.classList.remove('d-none', 'alert-success', 'alert-danger');
-
         if (response.ok) {
-            messageBox.innerText = data.message;
-            messageBox.classList.add('alert-success');
-            messageBox.classList.remove('d-none');
+            showAlert(data.message, true);
             
             // If we happen to delete the category currently in Edit Mode, reset form
             if (editingCategoryId === deletingCategoryId) {
@@ -240,16 +242,11 @@ async function executeDelete() {
             
             loadCategories();
         } else {
-            messageBox.innerText = data.message || "Failed to delete category.";
-            messageBox.classList.add('alert-danger');
-            messageBox.classList.remove('d-none');
+            showAlert(data.message || "Failed to delete category.", false);
         }
     } catch (error) {
         console.error('Error:', error);
-        const messageBox = document.getElementById('messageBox');
-        messageBox.innerText = "Network error. Make sure your server is running.";
-        messageBox.classList.add('alert-danger');
-        messageBox.classList.remove('d-none');
+        showAlert("Network error. Make sure your server is running.", false);
     } finally {
         confirmBtn.disabled = false;
         confirmBtn.innerText = "Delete";

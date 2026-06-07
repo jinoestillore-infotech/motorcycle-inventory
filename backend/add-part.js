@@ -127,3 +127,66 @@ async function handleAddPart(event) {
 
 // Fetch drop-down items immediately upon mounting
 loadCategoryDropdown();
+
+// Helper to show alert that automatically disappears after 2 seconds
+function showAlert(message, isSuccess) {
+    const messageBox = document.getElementById('messageBox');
+    messageBox.innerText = message;
+    messageBox.className = `alert ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+    messageBox.classList.remove('d-none');
+
+    // Automatically hide alert after 2000ms (2 seconds)
+    setTimeout(() => {
+        messageBox.classList.add('d-none');
+    }, 2000);
+}
+
+async function handleAddPart(event) {
+    event.preventDefault();
+
+    const messageBox = document.getElementById('messageBox');
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+
+    submitBtn.disabled = true;
+    messageBox.classList.add('d-none');
+
+    const requestBody = {
+        sku: document.getElementById('partSku').value,
+        name: document.getElementById('partName').value,
+        category_id: document.getElementById('partCategory').value,
+        brand: document.getElementById('partBrand').value,
+        stock_quantity: document.getElementById('partStock').value,
+        price: document.getElementById('partPrice').value,
+        compatible_models: document.getElementById('compatibleModels').value
+    };
+
+    try {
+        const response = await fetch(PARTS_API, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Use our new auto-dismissing alert
+            showAlert(data.message, true);
+            
+            // Clear the form
+            document.getElementById('addPartForm').reset();
+            document.getElementById('partCategory').value = ""; // Reset dropdown styling selection explicitly
+        } else {
+            showAlert(data.message || "Failed to add motorcycle part.", false);
+        }
+
+    } catch (error) {
+        console.error('Submission error:', error);
+        showAlert("Network error. Make sure your server is running.", false);
+    } finally {
+        submitBtn.disabled = false;
+    }
+}
