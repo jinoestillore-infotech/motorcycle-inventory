@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - Moto Parts Inventory</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        /* Sidebar Styles (Same as Dashboard) */
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 12px 20px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #0d6efd;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+            padding: 20px;
+            display: block;
+            text-align: center;
+            border-bottom: 1px solid #495057;
+            margin-bottom: 20px;
+        }
+        .main-content {
+            width: 100%;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-none d-md-block col-md-3 col-lg-2">
+        <a href="index.html" class="brand-logo">
+            <i class="bi bi-gear-wide-connected text-primary"></i> MotoStock
+        </a>
+        <ul class="nav flex-column px-2">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="inventory.html">
+                    <i class="bi bi-box-seam"></i> Parts Inventory
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="add-part.html">
+                    <i class="bi bi-plus-circle"></i> Add New Part
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="categories.html">
+                    <i class="bi bi-tags"></i> Categories
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="#">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-primary d-md-none me-3" id="sidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0">Manage Categories</h4>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=User" alt="User" width="32" height="32" class="rounded-circle me-2">
+                    <strong id="userNameDisplay">Loading...</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Sign out</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <div class="row g-4">
+            <!-- Add Category Form -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Add New Category</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="messageBox" class="alert d-none" role="alert"></div>
+                        <form id="addCategoryForm" onsubmit="handleAddCategory(event)">
+                            <div class="mb-3">
+                                <label for="categoryName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="categoryName" placeholder="e.g., Brakes, Engine" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoryDescription" class="form-label">Description (Optional)</label>
+                                <textarea class="form-control" id="categoryDescription" rows="3" placeholder="Brief description of parts in this category"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle me-1"></i> Add Category
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories List Table -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold">Existing Categories</h6>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadCategories()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Category Name</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriesTableBody">
+                                    <!-- Dynamic content will be loaded here -->
+                                    <tr><td colspan="4" class="text-center py-4">Loading categories...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS -->
+<script>
+    // --- Authentication Check ---
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+
+    if (!token || !userStr) {
+        window.location.href = 'login.html';
+    } else {
+        const user = JSON.parse(userStr);
+        document.getElementById('userNameDisplay').innerText = user.name;
+        document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0d6efd&color=fff`;
+    }
+
+    // Handle Logout
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    });
+
+    // Toggle Sidebar
+    document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('d-none');
+        sidebar.classList.toggle('position-absolute');
+        sidebar.classList.toggle('z-3');
+        sidebar.classList.toggle('w-75');
+    });
+
+    // --- API Interactions ---
+    const API_URL = 'http://localhost:3000/api/categories';
+
+    // Fetch and display categories
+    async function loadCategories() {
+        const tbody = document.getElementById('categoriesTableBody');
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>';
+
+        try {
+            const response = await fetch(API_URL, {
+                headers: {
+                    'Authorization': `Bearer ${token}` // Passing the JWT Token!
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    // Token expired or invalid
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                    return;
+                }
+                throw new Error('Failed to fetch categories');
+            }
+
+            const categories = await response.json();
+            
+            if (categories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No categories found. Add one on the left!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; // Clear loading text
+            categories.forEach(cat => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${cat.id}</td>
+                    <td class="fw-bold">${cat.name}</td>
+                    <td class="text-muted text-truncate" style="max-width: 200px;">${cat.description || '-'}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger">Error loading categories. Make sure server is running.</td></tr>`;
+        }
+    }
+
+    // Add a new category
+    async function handleAddCategory(event) {
+        event.preventDefault();
+        
+        const nameInput = document.getElementById('categoryName');
+        const descInput = document.getElementById('categoryDescription');
+        const messageBox = document.getElementById('messageBox');
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+
+        submitBtn.disabled = true;
+        messageBox.classList.add('d-none');
+        messageBox.classList.remove('alert-success', 'alert-danger');
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Passing the JWT Token!
+                },
+                body: JSON.stringify({
+                    name: nameInput.value,
+                    description: descInput.value
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                messageBox.innerText = data.message;
+                messageBox.classList.add('alert-success');
+                messageBox.classList.remove('d-none');
+                
+                // Clear form
+                nameInput.value = '';
+                descInput.value = '';
+                
+                // Refresh table
+                loadCategories();
+            } else {
+                messageBox.innerText = data.message || "Failed to add category.";
+                messageBox.classList.add('alert-danger');
+                messageBox.classList.remove('d-none');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            messageBox.innerText = "Network error. Make sure your server is running.";
+            messageBox.classList.add('alert-danger');
+            messageBox.classList.remove('d-none');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Load categories immediately when page opens
+    loadCategories();
+</script>
+</body>
+</html>
