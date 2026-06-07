@@ -8,66 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <style>
-        body {
-            background-color: #f4f6f9;
-        }
-        /* Sidebar Styles */
-        .sidebar {
-            min-height: 100vh;
-            background-color: #212529;
-            transition: all 0.3s;
-        }
-        .sidebar .nav-link {
-            color: #adb5bd;
-            padding: 12px 20px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-        }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: #fff;
-            background-color: #0d6efd;
-        }
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            font-size: 1.1rem;
-        }
-        .brand-logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            text-decoration: none;
-            padding: 20px;
-            display: block;
-            text-align: center;
-            border-bottom: 1px solid #495057;
-            margin-bottom: 20px;
-        }
-        /* Content Styles */
-        .main-content {
-            width: 100%;
-            padding: 20px;
-        }
-        .card-kpi {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .card-kpi:hover {
-            transform: translateY(-5px);
-        }
-        .icon-box {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-    </style>
+    <link href="assets/css/dashboard.css" rel="stylesheet">
 </head>
 <body>
 
@@ -245,50 +186,7 @@
 
 <!-- Bootstrap 5 JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <!-- Custom JS for Frontend functionality -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- Authentication Check ---
-        const token = localStorage.getItem('token');
-        const userStr = localStorage.getItem('user');
-
-        if (!token || !userStr) {
-            // User is not logged in, redirect to login page
-            window.location.href = 'login.html';
-            return; // Stop execution
-        }
-
-        // Parse user data and update UI
-        const user = JSON.parse(userStr);
-        document.getElementById('userNameDisplay').innerText = user.name;
-        
-        // Generate an avatar based on the user's name
-        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0d6efd&color=fff`;
-        document.getElementById('userAvatar').src = avatarUrl;
-
-        // Handle Logout
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'login.html';
-        });
-
-        // --- Sidebar Logic ---
-        // Simple logic to toggle sidebar on smaller screens (Mobile functionality)
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('.sidebar');
-        
-        if(sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('d-none');
-                sidebar.classList.toggle('position-absolute');
-                sidebar.classList.toggle('z-3');
-                sidebar.classList.toggle('w-75');
-            });
-        }
-    });
-</script>
+<script src="../backend/dashboard.js"></script>
 </body>
 </html>
