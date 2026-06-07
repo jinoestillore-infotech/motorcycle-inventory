@@ -110,7 +110,13 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold">Stock Inventory Directory</h6>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <select id="itemsPerPageSelect" class="form-select form-select-sm" style="width: auto;" onchange="changeItemsPerPage(this.value)">
+                        <option value="5">5 per page</option>
+                        <option value="10" selected>10 per page</option>
+                        <option value="25">25 per page</option>
+                        <option value="50">50 per page</option>
+                    </select>
                     <button class="btn btn-sm btn-outline-secondary" onclick="loadInventory()">
                         <i class="bi bi-arrow-clockwise me-1"></i> Refresh List
                     </button>
@@ -141,6 +147,16 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center flex-wrap py-3 border-top">
+                <div class="text-muted small mb-2 mb-sm-0" id="paginationInfo">
+                    Showing 0 to 0 of 0 entries
+                </div>
+                <nav aria-label="Inventory Page Navigation">
+                    <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                        <!-- Dynamic page links will render here -->
+                    </ul>
+                </nav>
             </div>
         </div>
 

@@ -38,16 +38,26 @@ function showAlert(message, isSuccess, elementId = 'messageBox') {
     }, 2000);
 }
 
-// Modal Initializations
 let editPartModal = null;
 let deletePartModal = null;
 let activePartId = null;
-let inventoryStore = []; // Holding elements locally to make quick search & filters seamless
+
+// Pagination state values
+let inventoryStore = [];  // Raw API dataset
+let filteredStore = [];   // Filtered/searched dataset matching filters
+let currentPage = 1;      // Currently visible page
+let itemsPerPage = 10;    // Number of elements displayed per page
 
 document.addEventListener('DOMContentLoaded', () => {
     editPartModal = new bootstrap.Modal(document.getElementById('editPartModal'));
     deletePartModal = new bootstrap.Modal(document.getElementById('deletePartModal'));
     
+    // Check initial dropdown value for page limit setting
+    const limitSelect = document.getElementById('itemsPerPageSelect');
+    if (limitSelect) {
+        itemsPerPage = parseInt(limitSelect.value) || 10;
+    }
+
     loadCategoriesFilter();
     loadInventory();
 });
@@ -104,24 +114,38 @@ async function loadInventory() {
         }
 
         inventoryStore = await response.json();
-        renderInventory(inventoryStore);
+        filteredStore = [...inventoryStore];
+        currentPage = 1; // Reset to page 1 on fresh load
+        renderInventory();
     } catch (error) {
         console.error(error);
         tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i>Could not retrieve parts directory. Make sure the Node server is running.</td></tr>`;
     }
 }
 
-// Injecting HTML table templates 
-function renderInventory(items) {
+function renderInventory() {
     const tbody = document.getElementById('inventoryTableBody');
     tbody.innerHTML = '';
 
-    if (items.length === 0) {
+    const totalItems = filteredStore.length;
+
+    if (totalItems === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No compatible parts found. Adjust filters or register a new part!</td></tr>';
+        updatePaginationControls(0);
         return;
     }
 
-    items.forEach(part => {
+    // Safety checks for active page index bounds
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    // Slice array to extract elements for the active page
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    const paginatedItems = filteredStore.slice(startIndex, endIndex);
+
+    paginatedItems.forEach(part => {
         let stockBadge = '';
         if (part.stock_quantity === 0) {
             stockBadge = '<span class="stock-badge bg-danger bg-opacity-10 text-danger fw-bold">Out</span>';
@@ -151,6 +175,95 @@ function renderInventory(items) {
         `;
         tbody.appendChild(tr);
     });
+
+    updatePaginationControls(totalItems);
+}
+
+function updatePaginationControls(totalItems) {
+    const infoBox = document.getElementById('paginationInfo');
+    const controlsContainer = document.getElementById('paginationControls');
+
+    if (!infoBox || !controlsContainer) return;
+
+    if (totalItems === 0) {
+        infoBox.innerText = 'Showing 0 to 0 of 0 entries';
+        controlsContainer.innerHTML = '';
+        return;
+    }
+
+    // Set textual status indicators
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems);
+    infoBox.innerText = `Showing ${startIndex} to ${endIndex} of ${totalItems} entries`;
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    let html = '';
+
+    // Render Back Page Control
+    const prevDisabled = currentPage === 1 ? 'disabled' : '';
+    html += `
+        <li class="page-item ${prevDisabled}">
+            <button class="page-link" onclick="changePage(${currentPage - 1})" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </button>
+        </li>
+    `;
+
+    // Render logical block window calculations (up to 5 buttons max)
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = startPage + maxVisiblePages - 1;
+
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Pre-ellipse indicators
+    if (startPage > 1) {
+        html += `
+            <li class="page-item">
+                <button class="page-link" onclick="changePage(1)">1</button>
+            </li>
+        `;
+        if (startPage > 2) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+
+    // Main page loop
+    for (let i = startPage; i <= endPage; i++) {
+        const activeClass = i === currentPage ? 'active' : '';
+        html += `
+            <li class="page-item ${activeClass}">
+                <button class="page-link" onclick="changePage(${i})">${i}</button>
+            </li>
+        `;
+    }
+
+    // Post-ellipse indicators
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        html += `
+            <li class="page-item">
+                <button class="page-link" onclick="changePage(${totalPages})">${totalPages}</button>
+            </li>
+        `;
+    }
+
+    // Render Forward Page Control
+    const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+    html += `
+        <li class="page-item ${nextDisabled}">
+            <button class="page-link" onclick="changePage(${currentPage + 1})" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </button>
+        </li>
+    `;
+
+    controlsContainer.innerHTML = html;
 }
 
 function filterInventory() {
@@ -158,7 +271,7 @@ function filterInventory() {
     const categoryVal = document.getElementById('categoryFilter').value;
     const stockVal = document.getElementById('stockFilter').value;
 
-    const filtered = inventoryStore.filter(part => {
+    filteredStore = inventoryStore.filter(part => {
         const matchesSearch = part.sku.toLowerCase().includes(searchVal) || 
                                 part.name.toLowerCase().includes(searchVal) || 
                                 (part.brand && part.brand.toLowerCase().includes(searchVal));
@@ -177,7 +290,19 @@ function filterInventory() {
         return matchesSearch && matchesCategory && matchesStock;
     });
 
-    renderInventory(filtered);
+    currentPage = 1; // Return to the first page when filter changes
+    renderInventory();
+}
+
+function changePage(page) {
+    currentPage = page;
+    renderInventory();
+}
+
+function changeItemsPerPage(size) {
+    itemsPerPage = parseInt(size);
+    currentPage = 1;
+    renderInventory();
 }
 
 function openEditModal(partId) {
