@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Part - Moto Parts Inventory</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        /* Sidebar Styles */
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 12px 20px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #0d6efd;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+            padding: 20px;
+            display: block;
+            text-align: center;
+            border-bottom: 1px solid #495057;
+            margin-bottom: 20px;
+        }
+        .main-content {
+            width: 100%;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-none d-md-block col-md-3 col-lg-2">
+        <a href="index.html" class="brand-logo">
+            <i class="bi bi-gear-wide-connected text-primary"></i> MotoStock
+        </a>
+        <ul class="nav flex-column px-2">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="inventory.html">
+                    <i class="bi bi-box-seam"></i> Parts Inventory
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="add-part.html">
+                    <i class="bi bi-plus-circle"></i> Add New Part
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="categories.html">
+                    <i class="bi bi-tags"></i> Categories
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="#">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-primary d-md-none me-3" id="sidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0">Add New Part</h4>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=User" alt="User" width="32" height="32" class="rounded-circle me-2">
+                    <strong id="userNameDisplay">Loading...</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Sign out</a></li>
+                </ul>
+            </div>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="m-0 font-weight-bold text-primary"><i class="bi bi-box-seam me-2"></i>Part Specifications</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="messageBox" class="alert d-none" role="alert"></div>
+                        
+                        <form id="addPartForm" onsubmit="handleAddPart(event)">
+                            <div class="row g-3">
+                                <!-- SKU / Barcode -->
+                                <div class="col-md-6">
+                                    <label for="partSku" class="form-label fw-semibold">SKU / Part Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="partSku" placeholder="e.g., BRK-BMB-001" required>
+                                    <div class="form-text">Unique barcode identifying the individual part.</div>
+                                </div>
+                                
+                                <!-- Part Name -->
+                                <div class="col-md-6">
+                                    <label for="partName" class="form-label fw-semibold">Part Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="partName" placeholder="e.g., Brembo Front Brake Pads" required>
+                                </div>
+
+                                <!-- Category Dropdown -->
+                                <div class="col-md-6">
+                                    <label for="partCategory" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="partCategory" required>
+                                        <option value="" disabled selected>Loading categories...</option>
+                                    </select>
+                                    <div class="form-text">Categories must be configured in the <a href="categories.html" class="text-decoration-none">Categories Panel</a> first.</div>
+                                </div>
+
+                                <!-- Brand / Manufacturer -->
+                                <div class="col-md-6">
+                                    <label for="partBrand" class="form-label fw-semibold">Brand / Manufacturer</label>
+                                    <input type="text" class="form-control" id="partBrand" placeholder="e.g., Brembo, NGK, Yamaha Genuine">
+                                </div>
+
+                                <!-- Price -->
+                                <div class="col-md-6">
+                                    <label for="partPrice" class="form-label fw-semibold">Price ($) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" min="0" class="form-control" id="partPrice" placeholder="0.00" required>
+                                    </div>
+                                </div>
+
+                                <!-- Initial Stock -->
+                                <div class="col-md-6">
+                                    <label for="partStock" class="form-label fw-semibold">Initial Stock Quantity <span class="text-danger">*</span></label>
+                                    <input type="number" min="0" class="form-control" id="partStock" value="0" required>
+                                </div>
+
+                                <!-- Compatible Models -->
+                                <div class="col-12">
+                                    <label for="compatibleModels" class="form-label fw-semibold">Compatible Motorcycle Models</label>
+                                    <textarea class="form-control" id="compatibleModels" rows="3" placeholder="e.g., Yamaha MT-07 (2018-2023), Honda CB650R (2019-2024)"></textarea>
+                                    <div class="form-text">List models that can safely utilize this part. Separate multiple models with commas.</div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Submit Controls -->
+                            <div class="d-flex gap-3 justify-content-end">
+                                <button type="reset" class="btn btn-outline-secondary px-4">Clear Form</button>
+                                <button type="submit" class="btn btn-primary px-5">
+                                    <i class="bi bi-plus-circle me-1"></i> Register Part
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS logic -->
+<script>
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+
+    if (!token || !userStr) {
+        window.location.href = 'login.html';
+    } else {
+        const user = JSON.parse(userStr);
+        document.getElementById('userNameDisplay').innerText = user.name;
+        document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0d6efd&color=fff`;
+    }
+
+    // Handle Logout
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    });
+
+    // Toggle Sidebar
+    document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('d-none');
+        sidebar.classList.toggle('position-absolute');
+        sidebar.classList.toggle('z-3');
+        sidebar.classList.toggle('w-75');
+    });
+
+    const CATEGORIES_API = 'http://localhost:3000/api/categories';
+    const PARTS_API = 'http://localhost:3000/api/parts';
+
+    async function loadCategoryDropdown() {
+        const dropdown = document.getElementById('partCategory');
+
+        try {
+            const response = await fetch(CATEGORIES_API, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                    return;
+                }
+                throw new Error('Failed to load categories');
+            }
+
+            const categories = await response.json();
+            
+            if (categories.length === 0) {
+                dropdown.innerHTML = '<option value="" disabled selected>No categories found. Click link below to add one first.</option>';
+                return;
+            }
+
+            dropdown.innerHTML = '<option value="" disabled selected>Choose a category...</option>';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.innerText = cat.name;
+                dropdown.appendChild(opt);
+            });
+
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            dropdown.innerHTML = '<option value="" disabled>Error loading categories. Make sure server is running.</option>';
+        }
+    }
+
+    async function handleAddPart(event) {
+        event.preventDefault();
+
+        const messageBox = document.getElementById('messageBox');
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+
+        submitBtn.disabled = true;
+        messageBox.classList.add('d-none');
+        messageBox.classList.remove('alert-success', 'alert-danger');
+
+        const requestBody = {
+            sku: document.getElementById('partSku').value,
+            name: document.getElementById('partName').value,
+            category_id: document.getElementById('partCategory').value,
+            brand: document.getElementById('partBrand').value,
+            stock_quantity: document.getElementById('partStock').value,
+            price: document.getElementById('partPrice').value,
+            compatible_models: document.getElementById('compatibleModels').value
+        };
+
+        try {
+            const response = await fetch(PARTS_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                messageBox.innerText = data.message;
+                messageBox.classList.add('alert-success');
+                messageBox.classList.remove('d-none');
+                
+                // Clear the form
+                document.getElementById('addPartForm').reset();
+                document.getElementById('partCategory').value = ""; // Reset dropdown styling selection explicitly
+            } else {
+                messageBox.innerText = data.message || "Failed to add motorcycle part.";
+                messageBox.classList.add('alert-danger');
+                messageBox.classList.remove('d-none');
+            }
+
+        } catch (error) {
+            console.error('Submission error:', error);
+            messageBox.innerText = "Network error. Make sure your server is running.";
+            messageBox.classList.add('alert-danger');
+            messageBox.classList.remove('d-none');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Fetch drop-down items immediately upon mounting
+    loadCategoryDropdown();
+</script>
+</body>
+</html>

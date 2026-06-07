@@ -3,6 +3,7 @@ const cors = require('cors');
 const db = require('./config/db'); // Just to initialize the connection
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const partRoutes = require('./routes/partRoutes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 // Mount the auth routes. This prefixes all routes in authRoutes.js with /api/auth
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/parts', partRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
